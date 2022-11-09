@@ -1,13 +1,11 @@
 {
     "General": {
-        "prefix": "!"
-    },
-    "1039725464589180928": {
-        "communityName": "test",
-        "prefix": "%"
+        "prefix": "/"
     },
     "970144871035834369": {
         "communityName": "FERD SERVER (@ElHaban3ro)",
-        "prefix": "/"
+        "ombiHost": "https://playgames.com/apiweb",
+        "prefix": "/",
+        "ombiApikey": "aguanteLouta"
     }
 }
