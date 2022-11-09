@@ -22,7 +22,11 @@ def get_prefix_custom(*args):
         communities_data = json.load(json_file)
 
     if len(args) >= 1:
-        return communities_data[args[0]]['prefix']
+        if args[0] in list(communities_data.keys()):
+            return communities_data[args[0]]['prefix']
+
+        else:
+            return communities_data['General']['prefix']
 
     else:
         return communities_data['General']['prefix']
@@ -49,33 +53,43 @@ async def on_ready():
 @client.command()
 async def prefix(ctx, *args):
     args = list(args)
-    new_prefix = args[0]
 
-    with open('./src/communities.json', 'r+') as file_json:
-        communities_json = json.load(file_json)
-        print(communities_json)
+    if len(args) == 1:
+        new_prefix = args[0]
 
-        if str(ctx.guild.id) in list(communities_json.keys()):
-            communities_json.pop(str(ctx.guild.id))
+        with open('./src/communities.json', 'r+') as file_json:
+            communities_json = json.load(file_json)
+            print(communities_json)
 
-
-        communities_json.update({ctx.guild.id: {'communityName': ctx.guild.name, 'prefix': new_prefix}})
-
-        print(communities_json)
-        
-
-        # communities_json[ctx.guild.id] = {'communityName': ctx.guild.name, 'prefix': new_prefix}
-        file_json.seek(0)
-        json.dump(communities_json, file_json, indent = 4)
-        file_json.truncate()
+            if str(ctx.guild.id) in list(communities_json.keys()):
+                communities_json.pop(str(ctx.guild.id))
 
 
+            communities_json.update({ctx.guild.id: {'communityName': ctx.guild.name, 'prefix': new_prefix}})
 
-    embed = discord.Embed(title = 'Change prefix | BOTMBI', description=f'New prefix ---- > {new_prefix} < ---- !!', url='https://github.com/elhaban3ro', color=0xFFD062)
-    embed.set_footer(text = f'view more with {get_prefix_custom()}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
-    embed.set_author(name = f'Hi, {str(ctx.author)[:str(ctx.author).find("#")]}', url = 'https://github.com/elhaban3ro', icon_url = ctx.author.avatar)
+            print(communities_json)
+            
 
-    await ctx.reply(embed = embed)
+            # communities_json[ctx.guild.id] = {'communityName': ctx.guild.name, 'prefix': new_prefix}
+            file_json.seek(0)
+            json.dump(communities_json, file_json, indent = 4)
+            file_json.truncate()
+
+
+
+        embed = discord.Embed(title = 'Change prefix | BOTMBI', description=f'New prefix ---- > {new_prefix} < ---- !!', url='https://github.com/elhaban3ro', color=0xFFD062)
+        embed.set_footer(text = f'view more with {get_prefix_custom(str(ctx.author.id))}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+        embed.set_author(name = f'Hi, {str(ctx.author)[:str(ctx.author).find("#")]}', url = 'https://github.com/elhaban3ro', icon_url = ctx.author.avatar)
+
+        await ctx.reply(embed = embed)
+
+
+    else:
+        embed = discord.Embed(title = 'Error to set prefix | BOTMBI', description=f'Error setting your new prefix, follow the following format:\n```{get_prefix_custom(str(ctx.author.id))}prefix [new prefix]```', url='https://github.com/elhaban3ro', color=0xFFD062)
+        embed.set_footer(text = f'view more with {get_prefix_custom(str(ctx.author.id))}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+        embed.set_author(name = f'Hi, {str(ctx.author)[:str(ctx.author).find("#")]}', url = 'https://github.com/elhaban3ro', icon_url = ctx.author.avatar)
+
+        await ctx.reply(embed = embed)
 
 
 
@@ -99,7 +113,7 @@ async def config(ctx, *args):
             if config_name == 'host':
                 if 'https://' in config_value or 'http://' in config_value:
                     await ctx.channel.send('*Valid Host*')
-                    community_data = {'communityId': ctx.guild.id, 'communityName': ctx.guild.name, 'prefix': get_prefix_custom()}
+                    community_data = {'communityId': ctx.guild.id, 'communityName': ctx.guild.name, 'prefix': get_prefix_custom(str(ctx.author.id))}
 
                     print(community_data)
 
@@ -116,7 +130,7 @@ async def config(ctx, *args):
             else:
                 embed = discord.Embed(title = 'BOTMBI', description='Option not available\nFollow the format below:\n\t```!config [ombi] [host, apikey] [value]```', url='https://github.com/elhaban3ro', color=0xFFD062)
 
-                embed.set_footer(text = f'view more with {get_prefix_custom()}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+                embed.set_footer(text = f'view more with {get_prefix_custom(str(ctx.author.id))}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
                 embed.set_author(name = f'Hi, {str(ctx.author)[:str(ctx.author).find("#")]}', url = 'https://github.com/elhaban3ro', icon_url = ctx.author.avatar)
 
                 await ctx.reply(embed = embed)
@@ -125,7 +139,7 @@ async def config(ctx, *args):
         else:
             embed = discord.Embed(title = 'BOTMBI', description='Option not available\nFollow the format below:\n\t```!config [ombi] [host, apikey] [value]```', url='https://github.com/elhaban3ro', color=0xFFD062)
 
-            embed.set_footer(text = f'view more with {get_prefix_custom()}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+            embed.set_footer(text = f'view more with {get_prefix_custom(str(ctx.author.id))}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
             embed.set_author(name = f'Hi, {str(ctx.author)[:str(ctx.author).find("#")]}', url = 'https://github.com/elhaban3ro', icon_url = ctx.author.avatar)
 
             await ctx.reply(embed = embed)
@@ -133,7 +147,7 @@ async def config(ctx, *args):
 
     else:
         embed = discord.Embed(title = 'BOTMBI', description='Be sure to pass the appropriate parameters.\nFollow the format below:\n\t```!config [ombi] [host, apikey] [value]```', url='https://github.com/elhaban3ro', color=0xFFD062)
-        embed.set_footer(text = f'view more with {get_prefix_custom()}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+        embed.set_footer(text = f'view more with {get_prefix_custom(str(ctx.author.id))}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
         embed.set_author(name = f'Hi, {str(ctx.author)[:str(ctx.author).find("#")]}', url = 'https://github.com/elhaban3ro', icon_url = ctx.author.avatar)
 
         await ctx.reply(embed = embed)
