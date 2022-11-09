@@ -16,7 +16,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 
 
-# class Client()
+# class Client(commands.Bot)
 global prefix_local_dict
 prefix_local_dict = {}
 
@@ -26,21 +26,23 @@ with open('./src/communities.json', 'r+') as prefix_file:
 
 
 async def get_prefix_custom(bot, message):
-    print('a')
+    
+    # Print chat: to manage and debug.
+    print(f'{message.author}: {message.content} \t [{message.guild.name}]')
+
+
+
 
     guild = message.guild
 
-
     if str(guild.id) in list(prefix_local_dict.keys()):
-        print(prefix_local_dict)
+        
         return prefix_local_dict[str(guild.id)]['prefix']
 
     else:
         return prefix_local_dict['General']['prefix']
 
-
-
-
+        
 client = commands.Bot(command_prefix = get_prefix_custom, intents=intents)
 
 
@@ -71,9 +73,11 @@ async def prefix(ctx, *args):
 
             communities_json.update({str(ctx.guild.id): {'communityName': ctx.guild.name, 'prefix': new_prefix}})
 
-            
+
+            global prefix_local_dict            
+            prefix_local_dict['SEXO'] = 'sí?'
             prefix_local_dict = communities_json
-            
+                
 
             # communities_json[ctx.guild.id] = {'communityName': ctx.guild.name, 'prefix': new_prefix}
             file_json.seek(0)
