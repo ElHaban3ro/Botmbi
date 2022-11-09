@@ -20,6 +20,9 @@ intents.message_content = True
 global prefix_local_dict
 prefix_local_dict = {}
 
+global prefix_see
+prefix_see = ''
+
 with open('./src/communities.json', 'r+') as prefix_file:
     r_prefix_file = json.load(prefix_file)
     prefix_local_dict = r_prefix_file
@@ -33,16 +36,19 @@ async def get_prefix_custom(bot, message):
 
 
 
+    global prefix_see
     guild = message.guild
 
     if str(guild.id) in list(prefix_local_dict.keys()):
         
+        prefix_see = prefix_local_dict[str(guild.id)]['prefix']
         return prefix_local_dict[str(guild.id)]['prefix']
 
     else:
+        prefix_see = prefix_local_dict['General']['prefix']
         return prefix_local_dict['General']['prefix']
 
-        
+
 client = commands.Bot(command_prefix = get_prefix_custom, intents=intents)
 
 
@@ -87,16 +93,16 @@ async def prefix(ctx, *args):
 
     
 
-        embed = discord.Embed(title = 'Change prefix | BOTMBI', description=f'New prefix ---- > {new_prefix} < ---- !!', url='https://github.com/elhaban3ro', color=0xFFD062)
-        embed.set_footer(text = f'view more with PREFIX_TESThelp', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+        embed = discord.Embed(title = 'Change prefix | BOTMBI', description=f'New prefix > **{new_prefix}** < !!', url='https://github.com/elhaban3ro', color=0xFFD062)
+        embed.set_footer(text = f'view more with {prefix_see}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
         embed.set_author(name = f'Hi, {str(ctx.author)[:str(ctx.author).find("#")]}', url = 'https://github.com/elhaban3ro', icon_url = ctx.author.avatar)
 
         await ctx.reply(embed = embed)
 
 
     else:
-        embed = discord.Embed(title = 'Error to set prefix | BOTMBI', description=f'Error setting your new prefix, follow the following format:\n```PREFIX_TESTprefix [new prefix]```', url='https://github.com/elhaban3ro', color=0xFFD062)
-        embed.set_footer(text = f'view more with PREFIX_TESThelp', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+        embed = discord.Embed(title = 'Error to set prefix | BOTMBI', description=f'Error setting your new prefix, follow the following format:\n```{prefix_see}prefix [new prefix]```', url='https://github.com/elhaban3ro', color=0xFFD062)
+        embed.set_footer(text = f'view more with {prefix_see}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
         embed.set_author(name = f'Hi, {str(ctx.author)[:str(ctx.author).find("#")]}', url = 'https://github.com/elhaban3ro', icon_url = ctx.author.avatar)
 
         await ctx.reply(embed = embed)
@@ -140,7 +146,7 @@ async def config(ctx, *args):
             else:
                 embed = discord.Embed(title = 'BOTMBI', description='Option not available\nFollow the format below:\n\t```!config [ombi] [host, apikey] [value]```', url='https://github.com/elhaban3ro', color=0xFFD062)
 
-                embed.set_footer(text = f'view more with PREFIX_TESThelp', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+                embed.set_footer(text = f'view more with {prefix_see}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
                 embed.set_author(name = f'Hi, {str(ctx.author)[:str(ctx.author).find("#")]}', url = 'https://github.com/elhaban3ro', icon_url = ctx.author.avatar)
 
                 await ctx.reply(embed = embed)
@@ -149,7 +155,7 @@ async def config(ctx, *args):
         else:
             embed = discord.Embed(title = 'BOTMBI', description='Option not available\nFollow the format below:\n\t```!config [ombi] [host, apikey] [value]```', url='https://github.com/elhaban3ro', color=0xFFD062)
 
-            embed.set_footer(text = f'view more with PREFIX_TESThelp', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+            embed.set_footer(text = f'view more with {prefix_see}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
             embed.set_author(name = f'Hi, {str(ctx.author)[:str(ctx.author).find("#")]}', url = 'https://github.com/elhaban3ro', icon_url = ctx.author.avatar)
 
             await ctx.reply(embed = embed)
@@ -157,7 +163,7 @@ async def config(ctx, *args):
 
     else:
         embed = discord.Embed(title = 'BOTMBI', description='Be sure to pass the appropriate parameters.\nFollow the format below:\n\t```!config [ombi] [host, apikey] [value]```', url='https://github.com/elhaban3ro', color=0xFFD062)
-        embed.set_footer(text = f'view more with PREFIX_TESThelp', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+        embed.set_footer(text = f'view more with {prefix_see}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
         embed.set_author(name = f'Hi, {str(ctx.author)[:str(ctx.author).find("#")]}', url = 'https://github.com/elhaban3ro', icon_url = ctx.author.avatar)
 
         await ctx.reply(embed = embed)
@@ -165,14 +171,21 @@ async def config(ctx, *args):
 
 
 
-# History
 
-# Pausa los comandos :( rari
+client.remove_command('help')
+@client.command()
+async def help(message, *args):
+    
+    help_text = f'**Configure your Ombi app:** ```{prefix_see}config [ombi] [host, apikey] [value]```\n\n**Configure your bot:**```{prefix_see}prefix [new prefix]```'
 
-# @client.event
-# async def on_message(message):
-#     # TODO: Guardar historial en un archivo. Por ahora lo dejo solo en consola.
-#     print(f'{message.author}: {message.content}')
+    embed = discord.Embed(title = 'Commands Help | BOTMBI', description=help_text, url='https://github.com/elhaban3ro', color=0xFFD062)
+    embed.set_author(name = f'Hi, {str(message.author)[:str(message.author).find("#")]}', url = 'https://github.com/elhaban3ro', icon_url = message.author.avatar)
+    embed.set_footer(text = f'Recommendation: Automate everything with the help of MovieTool, click title.', icon_url='https://cdn-icons-png.flaticon.com/512/25/25231.png')
+    
+
+    await message.reply(embed = embed)
+
+
 
 
 
