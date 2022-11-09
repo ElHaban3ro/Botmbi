@@ -16,28 +16,32 @@ intents = discord.Intents.default()
 intents.message_content = True
 
 
+# class Client()
+global prefix_local_dict
+prefix_local_dict = {}
 
-def get_prefix_custom(*args):
-    with open('./src/communities.json') as json_file:
-        communities_data = json.load(json_file)
+with open('./src/communities.json', 'r+') as prefix_file:
+    r_prefix_file = json.load(prefix_file)
+    prefix_local_dict = r_prefix_file
 
-    if len(args) >= 1:
-        if args[0] in list(communities_data.keys()):
-            return communities_data[args[0]]['prefix']
 
-        else:
-            return communities_data['General']['prefix']
+async def get_prefix_custom(bot, message):
+    print('a')
+
+    guild = message.guild
+
+
+    if str(guild.id) in list(prefix_local_dict.keys()):
+        print(prefix_local_dict)
+        return prefix_local_dict[str(guild.id)]['prefix']
 
     else:
-        return communities_data['General']['prefix']
+        return prefix_local_dict['General']['prefix']
 
 
 
 
-
-
-
-client = commands.Bot(command_prefix=get_prefix_custom(), intents=intents)
+client = commands.Bot(command_prefix = get_prefix_custom, intents=intents)
 
 
 
@@ -59,15 +63,16 @@ async def prefix(ctx, *args):
 
         with open('./src/communities.json', 'r+') as file_json:
             communities_json = json.load(file_json)
-            print(communities_json)
+            
 
             if str(ctx.guild.id) in list(communities_json.keys()):
                 communities_json.pop(str(ctx.guild.id))
 
 
-            communities_json.update({ctx.guild.id: {'communityName': ctx.guild.name, 'prefix': new_prefix}})
+            communities_json.update({str(ctx.guild.id): {'communityName': ctx.guild.name, 'prefix': new_prefix}})
 
-            print(communities_json)
+            
+            prefix_local_dict = communities_json
             
 
             # communities_json[ctx.guild.id] = {'communityName': ctx.guild.name, 'prefix': new_prefix}
@@ -76,17 +81,18 @@ async def prefix(ctx, *args):
             file_json.truncate()
 
 
+    
 
         embed = discord.Embed(title = 'Change prefix | BOTMBI', description=f'New prefix ---- > {new_prefix} < ---- !!', url='https://github.com/elhaban3ro', color=0xFFD062)
-        embed.set_footer(text = f'view more with {get_prefix_custom(str(ctx.author.id))}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+        embed.set_footer(text = f'view more with PREFIX_TESThelp', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
         embed.set_author(name = f'Hi, {str(ctx.author)[:str(ctx.author).find("#")]}', url = 'https://github.com/elhaban3ro', icon_url = ctx.author.avatar)
 
         await ctx.reply(embed = embed)
 
 
     else:
-        embed = discord.Embed(title = 'Error to set prefix | BOTMBI', description=f'Error setting your new prefix, follow the following format:\n```{get_prefix_custom(str(ctx.author.id))}prefix [new prefix]```', url='https://github.com/elhaban3ro', color=0xFFD062)
-        embed.set_footer(text = f'view more with {get_prefix_custom(str(ctx.author.id))}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+        embed = discord.Embed(title = 'Error to set prefix | BOTMBI', description=f'Error setting your new prefix, follow the following format:\n```PREFIX_TESTprefix [new prefix]```', url='https://github.com/elhaban3ro', color=0xFFD062)
+        embed.set_footer(text = f'view more with PREFIX_TESThelp', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
         embed.set_author(name = f'Hi, {str(ctx.author)[:str(ctx.author).find("#")]}', url = 'https://github.com/elhaban3ro', icon_url = ctx.author.avatar)
 
         await ctx.reply(embed = embed)
@@ -130,7 +136,7 @@ async def config(ctx, *args):
             else:
                 embed = discord.Embed(title = 'BOTMBI', description='Option not available\nFollow the format below:\n\t```!config [ombi] [host, apikey] [value]```', url='https://github.com/elhaban3ro', color=0xFFD062)
 
-                embed.set_footer(text = f'view more with {get_prefix_custom(str(ctx.author.id))}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+                embed.set_footer(text = f'view more with PREFIX_TESThelp', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
                 embed.set_author(name = f'Hi, {str(ctx.author)[:str(ctx.author).find("#")]}', url = 'https://github.com/elhaban3ro', icon_url = ctx.author.avatar)
 
                 await ctx.reply(embed = embed)
@@ -139,7 +145,7 @@ async def config(ctx, *args):
         else:
             embed = discord.Embed(title = 'BOTMBI', description='Option not available\nFollow the format below:\n\t```!config [ombi] [host, apikey] [value]```', url='https://github.com/elhaban3ro', color=0xFFD062)
 
-            embed.set_footer(text = f'view more with {get_prefix_custom(str(ctx.author.id))}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+            embed.set_footer(text = f'view more with PREFIX_TESThelp', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
             embed.set_author(name = f'Hi, {str(ctx.author)[:str(ctx.author).find("#")]}', url = 'https://github.com/elhaban3ro', icon_url = ctx.author.avatar)
 
             await ctx.reply(embed = embed)
@@ -147,7 +153,7 @@ async def config(ctx, *args):
 
     else:
         embed = discord.Embed(title = 'BOTMBI', description='Be sure to pass the appropriate parameters.\nFollow the format below:\n\t```!config [ombi] [host, apikey] [value]```', url='https://github.com/elhaban3ro', color=0xFFD062)
-        embed.set_footer(text = f'view more with {get_prefix_custom(str(ctx.author.id))}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+        embed.set_footer(text = f'view more with PREFIX_TESThelp', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
         embed.set_author(name = f'Hi, {str(ctx.author)[:str(ctx.author).find("#")]}', url = 'https://github.com/elhaban3ro', icon_url = ctx.author.avatar)
 
         await ctx.reply(embed = embed)
@@ -173,7 +179,4 @@ with open(os.path.abspath('./private/config_bot.txt'), 'r') as f: # Se tiene que
     configs = f.readlines() # Lista de lines del archivo config!
     token = configs[0]
     
-
-
-
     client.run(token) # Login en sí con el bot!
