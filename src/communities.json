@@ -4,8 +4,11 @@
     },
     "970144871035834369": {
         "communityName": "FERD SERVER (@ElHaban3ro)",
-        "ombiHost": "https://playgames.com/apiweb",
         "prefix": "/",
-        "ombiApikey": "aguanteLouta"
+        "allowed_roles_ombi": [
+            "1039671423901368402",
+            "1040039949036171294"
+        ],
+        "ombiHost": "http://ombi.com"
     }
 }

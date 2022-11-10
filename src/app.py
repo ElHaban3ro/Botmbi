@@ -260,6 +260,90 @@ async def config(ctx, *args):
 
 
 
+@client.command()
+async def give(message, *args):
+
+    if message.author.guild_permissions.administrator:
+
+        p_mentions = list(args)
+        mentions = []
+        person_in_mentions = False
+
+        if len(p_mentions) >= 1:
+
+            for mention in p_mentions:
+                
+                if '<@&' in mention:
+                    mentions.append(mention[3:-1])
+
+                else:
+                    person_in_mentions = True
+
+            if person_in_mentions:
+                await message.channel.send('*You have sent in mentions to a user, remember that you cannot set permissions to a member, only to a role.*')
+
+            with open('./src/communities.json', 'r+') as file_json_z:
+                open_z = json.load(file_json_z)
+
+                if str(message.guild.id) in list(open_z.keys()):
+
+                    if 'allowed_roles_ombi' in list(open_z[str(message.guild.id)].keys()):
+                        for role in mentions:
+                            if role not in open_z[str(message.guild.id)]['allowed_roles_ombi']:
+                                open_z[str(message.guild.id)]['allowed_roles_ombi'].append(role)
+
+
+                    else:
+                        open_z[str(message.guild.id)]['allowed_roles_ombi'] = mentions
+
+
+
+                else:
+                    open_z[str(message.guild.id)] = {
+                        'communityName': message.guild.name,
+                        'prefix': open_z['General']['prefix'],
+                        'allowed_roles_ombi': mentions
+                    }
+
+
+                file_json_z.seek(0)
+                json.dump(open_z, file_json_z, indent=4)
+                file_json_z.truncate()
+
+                mention_roles = ''
+
+                for role in mentions:
+                    mention_roles = f'{mention_roles}, <@&{role}>'
+
+                
+
+                embed = discord.Embed(title = 'Add Permissions | BOTMBI', description=f'Permissions were successfully added for {mention_roles[1:]}.', url='https://github.com/elhaban3ro', color=0xFFD062)
+                embed.set_footer(text = f'view more with {prefix_see}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+                embed.set_author(name = f'Hi, {str(message.author)[:str(message.author).find("#")]}', url = 'https://github.com/elhaban3ro', icon_url = message.author.avatar)
+
+                await message.reply(embed = embed)
+
+                print(mentions)
+
+
+
+
+        else:
+            embed = discord.Embed(title = 'No mentions roles | BOTMBI', description=f'You have not mentioned any role :( Remember that to give permissions you must make mention of any one.', color=0xFFD062)
+            embed.set_author(name = f'Hi, {str(message.author)[:str(message.author).find("#")]}', url = 'https://github.com/elhaban3ro', icon_url = message.author.avatar)
+            embed.set_footer(text = f'view more with {prefix_see}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+
+            await message.reply(embed = embed)
+
+    else:
+        embed = discord.Embed(title = 'No administrator permission | BOTMBI', description=f'You do not have administrator permission. Please contact an administrator.', color=0xFFD062)
+        embed.set_author(name = f'Hi, {str(message.author)[:str(message.author).find("#")]}', url = 'https://github.com/elhaban3ro', icon_url = message.author.avatar)
+        embed.set_footer(text = f'view more with {prefix_see}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+
+        await message.reply(embed = embed)
+
+
+
 
 
 
@@ -282,6 +366,8 @@ async def help(message, *args):
     
 
     await message.reply(embed = embed)
+
+
 
 
 
