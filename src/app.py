@@ -526,7 +526,7 @@ async def search(message, *args):
 
                 if config_host and config_apikey:
 
-                    try:
+                    if True:
                         r_movie = requests.post(f'{host}/api/v2/Search/multi/{search[3:]}',
                         params = params, 
                         headers={'Content-Type':'application/json'},
@@ -548,35 +548,85 @@ async def search(message, *args):
 
 
 
-                        print(results)
 
 
 
+                        global img_index
+                        img_index = 0
 
 
-                        embed = discord.Embed(title = f'Result to: ', description=f'***ID:***', color=0xFFD062, )
+                        embed_img = discord.Embed(title = f'Result to: {results[img_index]["name"]}', description=f'***ID:*** {results[img_index]["id"]}', color=0xFFD062)
+                        
+
+                        embed_img.set_image(url = results[img_index]['cover'])
+
+                        embed_img.set_author(name = f'Hi, {str(message.author)[:str(message.author).find("#")]}.', url = 'https://github.com/elhaban3ro', icon_url = message.author.avatar)
+
+                        embed_img.set_footer(text = f'...', icon_url='https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Sign-check-icon.png/800px-Sign-check-icon.png')
+
+
 
                         
-                        # embed.set_image(url = results[0]['cover'])
+                        print(results)
+                        class ImageButtons(discord.ui.View):
 
-                        embed.set_author(name = f'Hi, {str(message.author)[:str(message.author).find("#")]}.', url = 'https://github.com/elhaban3ro', icon_url = message.author.avatar)
+
+                            # Before Image.
+                            @discord.ui.button(label='<', style=discord.ButtonStyle.green)
+                            async def before(self, interaction: discord.Interaction, button: discord.ui.Button):
+                                global img_index
+                                if img_index == 0:
+                                    img_index = len(results) - 1
+
+                                else:
+                                    img_index = img_index - 1
 
 
-                        embed.set_footer(text = f'...', icon_url='https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Sign-check-icon.png/800px-Sign-check-icon.png')
+                                embed_img.set_image(url = results[img_index]['cover'])
+                                embed_img.description = f'***ID: *** {results[img_index]["id"]}'
 
-                        await message.reply(embed = embed)
+                                button.style = discord.ButtonStyle.green
+                                await interaction.message.edit(embed=embed_img, view=self)
+
+
+
+                            # Next Image.
+                            @discord.ui.button(label='>', style=discord.ButtonStyle.green)
+                            async def next(self, interaction: discord.Interaction, button: discord.ui.Button):
+                                global img_index
+                                if img_index == len(results) - 1:
+                                    img_index = 0
+
+                                else:
+                                    img_index = img_index + 1
+
+
+
+                                embed_img.set_image(url = results[img_index]['cover'])
+                                embed_img.description = f'***ID: *** {results[img_index]["id"]}'
+
+
+                                button.style = discord.ButtonStyle.green
+                                await interaction.message.edit(embed=embed_img, view=self)
+
+
+
+
+
+
+                        await message.reply(embed = embed_img, view = ImageButtons())
 
 
                         
 
 
                         if r_movie.status_code == 200:
-                            embed = discord.Embed(title = f'SEARCH: {search_clean[1:]}', description=f'Indexing results...', color=0xFFD062)
-                            embed.set_author(name = f'Hi, {str(message.author)[:str(message.author).find("#")]}, thanks for shearch with Botmbi.', url = 'https://github.com/elhaban3ro', icon_url = message.author.avatar)
-                            embed.set_footer(text = f'Consult status: {r_movie.status_code}', icon_url='https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Sign-check-icon.png/800px-Sign-check-icon.png')
+                            pass
+                            # embed = discord.Embed(description=f'Indexing results...', color=0xFFD062)
+                            # embed.set_footer(text = f'Consult status: {r_movie.status_code}', icon_url='https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Sign-check-icon.png/800px-Sign-check-icon.png')
+                            # await message.reply(embed = embed)
 
 
-                            await message.reply(embed = embed)
 
                         else:
                             embed = discord.Embed(title = f'SEARCH: {search_clean[1:]}', description=f'Something happened...', color=0xFFD062)
@@ -588,12 +638,12 @@ async def search(message, *args):
 
 
 
-                    except:
-                        embed = discord.Embed(description=f'Error in the connection to your server, please check your connection. This may be due to an error in the API Key or in the Host itself.:```{prefix_see}config [ombi] [host, apikey] [value]```', color=0xFFD062)
+                    # except:
+                    #     embed = discord.Embed(description=f'Error in the connection to your server, please check your connection. This may be due to an error in the API Key or in the Host itself.:```{prefix_see}config [ombi] [host, apikey] [value]```', color=0xFFD062)
 
 
-                        embed.set_footer(text = f'view more with {prefix_see}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
-                        await message.reply(embed = embed)
+                    #     embed.set_footer(text = f'view more with {prefix_see}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+                    #     await message.reply(embed = embed)
 
 
 
