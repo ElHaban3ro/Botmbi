@@ -8,6 +8,7 @@
         "allowed_roles_ombi": [
             "986242807968710727"
         ],
-        "ombiHost": "http://ombi.com"
+        "ombiApikey": "8978789",
+        "ombiHost": "https://a.com"
     }
 }

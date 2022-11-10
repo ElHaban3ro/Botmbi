@@ -439,6 +439,71 @@ async def remove(message, *args):
 
 
 
+@client.command()
+async def search(message, search):
+    host = ''
+    config_host = False
+
+
+    apikey = ''
+    config_apikey = False
+
+    with open('./src/communities.json') as file_c:
+        json_c = json.load(file_c)
+        
+        if str(message.guild.id) in list(json_c.keys()):
+            print(json_c[str(message.guild.id)].keys())
+            if 'ombiHost' in list(json_c[str(message.guild.id)].keys()):
+                host = json_c[str(message.guild.id)]['ombiHost']
+                config_host = True
+
+            else:
+                embed = discord.Embed(description=f'The application is not configured. Try to configurate *host*```{prefix_see}config [ombi] [host] [value]```', color=0xFFD062)
+
+
+                embed.set_footer(text = f'view more with {prefix_see}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+                await message.reply(embed = embed)
+
+
+                
+
+
+            if 'ombiApikey' in list(json_c[str(message.guild.id)].keys()):
+                apikey = json_c[str(message.guild.id)]['ombiApikey']
+                config_apikey = True
+                
+
+            else:
+                embed = discord.Embed(description=f'The application is not configured. Try to configurate *apikey*:```{prefix_see}config [ombi] [apikey] [value]```', color=0xFFD062)
+
+
+                embed.set_footer(text = f'view more with {prefix_see}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+                await message.reply(embed = embed)
+
+
+
+        if config_host and config_apikey:
+            await message.reply(f'HOST: {host}\nAPIKEY: {apikey}')
+
+
+            
+
+
+
+    if message.author.guild_permissions.administrator:
+        pass
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
