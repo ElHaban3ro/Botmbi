@@ -60,6 +60,8 @@ client = commands.Bot(command_prefix = get_prefix_custom, intents=intents)
 @client.event
 async def on_ready():
     print(f'\n\n= = = = = Started bot! 🌟 | {client.user} = = = = =') # Bot iniciado.
+    # presence = discord.Activity(name = 'Ombi Requests', url = 'https://github.com/elhaban3ro', type='streaming', details = 'Use /help to view my commands', buttons = ['View GitHub'])
+    # await client.change_presence(activity=presence)
 
 
 
@@ -261,7 +263,7 @@ async def config(ctx, *args):
 
 
 @client.command()
-async def give(message, *args):
+async def add(message, *args):
 
     if message.author.guild_permissions.administrator:
 
@@ -316,20 +318,111 @@ async def give(message, *args):
                     mention_roles = f'{mention_roles}, <@&{role}>'
 
                 
+                if len(mentions) >= 1:
+                    embed = discord.Embed(title = 'Add Permissions | BOTMBI', description=f'Permissions were successfully added for {mention_roles[1:]}.', url='https://github.com/elhaban3ro', color=0xFFD062)
+                    embed.set_footer(text = f'view more with {prefix_see}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+                    embed.set_author(name = f'Hi, {str(message.author)[:str(message.author).find("#")]}', url = 'https://github.com/elhaban3ro', icon_url = message.author.avatar)
 
-                embed = discord.Embed(title = 'Add Permissions | BOTMBI', description=f'Permissions were successfully added for {mention_roles[1:]}.', url='https://github.com/elhaban3ro', color=0xFFD062)
-                embed.set_footer(text = f'view more with {prefix_see}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
-                embed.set_author(name = f'Hi, {str(message.author)[:str(message.author).find("#")]}', url = 'https://github.com/elhaban3ro', icon_url = message.author.avatar)
+                    await message.reply(embed = embed)
 
-                await message.reply(embed = embed)
 
-                print(mentions)
+        else:
+            embed = discord.Embed(title = 'No mentions roles | BOTMBI', description=f'You have not mentioned any role :( Remember that to give permissions you must make mention of any one. Use: ```{prefix_see}add [@roles]```', color=0xFFD062)
+            embed.set_author(name = f'Hi, {str(message.author)[:str(message.author).find("#")]}', url = 'https://github.com/elhaban3ro', icon_url = message.author.avatar)
+            embed.set_footer(text = f'view more with {prefix_see}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+
+            await message.reply(embed = embed)
+
+    else:
+        embed = discord.Embed(title = 'No administrator permission | BOTMBI', description=f'You do not have administrator permission. Please contact an administrator.', color=0xFFD062)
+        embed.set_author(name = f'Hi, {str(message.author)[:str(message.author).find("#")]}', url = 'https://github.com/elhaban3ro', icon_url = message.author.avatar)
+        embed.set_footer(text = f'view more with {prefix_see}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+
+        await message.reply(embed = embed)
+
+
+
+
+
+@client.command()
+async def remove(message, *args):
+    p_mentions = list(args)
+
+    if message.author.guild_permissions.administrator:
+
+        p_mentions = list(args)
+        mentions = []
+        removes_roles = []
+        person_in_mentions = False
+
+        if len(p_mentions) >= 1:
+
+            for mention in p_mentions:
+                
+                if '<@&' in mention:
+                    mentions.append(mention[3:-1])
+
+                else:
+                    person_in_mentions = True
+
+            if person_in_mentions:
+                await message.channel.send('*You have sent in mentions to a user, remember that you cannot set permissions to a member, only to a role.*')
+
+            with open('./src/communities.json', 'r+') as file_json_z:
+                open_z = json.load(file_json_z)
+
+                if str(message.guild.id) in list(open_z.keys()):
+
+                    if 'allowed_roles_ombi' in list(open_z[str(message.guild.id)].keys()):
+                        for role in mentions:
+                            if role in open_z[str(message.guild.id)]['allowed_roles_ombi']:
+                                print(role)
+                                removes_roles.append(role)
+                                open_z[str(message.guild.id)]['allowed_roles_ombi'].remove(role)
+
+
+                    else:                        
+                        embed = discord.Embed(title = 'There are no roles with assigned permissions | BOTMBI', description=f'None of the above roles have permissions configured.', url='https://github.com/elhaban3ro', color=0xFFD062)
+                        embed.set_footer(text = f'view more with {prefix_see}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+                        embed.set_author(name = f'Hi, {str(message.author)[:str(message.author).find("#")]}', url = 'https://github.com/elhaban3ro', icon_url = message.author.avatar)
+
+                        await message.reply(embed = embed)
+
+
+
+                else:
+                    embed = discord.Embed(title = 'There are no roles with assigned permissions | BOTMBI', description=f'None of the above roles have permissions configured.', url='https://github.com/elhaban3ro', color=0xFFD062)
+                    embed.set_footer(text = f'view more with {prefix_see}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+                    embed.set_author(name = f'Hi, {str(message.author)[:str(message.author).find("#")]}', url = 'https://github.com/elhaban3ro', icon_url = message.author.avatar)
+
+                    await message.reply(embed = embed)
+
+
+                file_json_z.seek(0)
+                json.dump(open_z, file_json_z, indent=4)
+                file_json_z.truncate()
+
+                mention_roles = ''
+
+                for role in removes_roles:
+                    mention_roles = f'{mention_roles}, <@&{role}>'
+
+                
+                if len(removes_roles) >= 1:
+                    embed = discord.Embed(title = 'Permits removed | BOTMBI', description=f'Petition permits were removed in  {mention_roles[1:]}.', url='https://github.com/elhaban3ro', color=0xFFD062)
+                    embed.set_footer(text = f'view more with {prefix_see}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+                    embed.set_author(name = f'Hi, {str(message.author)[:str(message.author).find("#")]}', url = 'https://github.com/elhaban3ro', icon_url = message.author.avatar)
+
+                    await message.reply(embed = embed)
+
+                    print(mentions)
+
 
 
 
 
         else:
-            embed = discord.Embed(title = 'No mentions roles | BOTMBI', description=f'You have not mentioned any role :( Remember that to give permissions you must make mention of any one.', color=0xFFD062)
+            embed = discord.Embed(title = 'No mentions roles | BOTMBI', description=f'You have not mentioned any role :( Remember that to give permissions you must make mention of any one. Use: ```{prefix_see}remove [@roles]```', color=0xFFD062)
             embed.set_author(name = f'Hi, {str(message.author)[:str(message.author).find("#")]}', url = 'https://github.com/elhaban3ro', icon_url = message.author.avatar)
             embed.set_footer(text = f'view more with {prefix_see}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
 
@@ -350,15 +443,11 @@ async def give(message, *args):
 
 
 
-
-
-
-
 client.remove_command('help')
 @client.command()
 async def help(message, *args):
     
-    help_text = f'**Configure your Ombi app:** ```{prefix_see}config [ombi] [host, apikey] [value]```\n\n**Configure your bot:**```{prefix_see}prefix [new prefix]```'
+    help_text = f'**Configure your Ombi app:** ```{prefix_see}config [ombi] [host, apikey] [value]```\n\n**Configure your prefix:**```{prefix_see}prefix [new prefix]```\n\n**Add permissions to a role so that they can make requests::**```{prefix_see}add [@roles]```\n\n**Remove permissions to a role so that they can make requests::**```{prefix_see}remove [@roles]```'
 
     embed = discord.Embed(title = 'Commands Help | BOTMBI', description=help_text, url='https://github.com/elhaban3ro', color=0xFFD062)
     embed.set_author(name = f'Hi, {str(message.author)[:str(message.author).find("#")]}', url = 'https://github.com/elhaban3ro', icon_url = message.author.avatar)

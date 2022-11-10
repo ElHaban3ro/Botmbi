@@ -4,10 +4,9 @@
     },
     "970144871035834369": {
         "communityName": "FERD SERVER (@ElHaban3ro)",
-        "prefix": "/",
+        "prefix": "!",
         "allowed_roles_ombi": [
-            "1039671423901368402",
-            "1040039949036171294"
+            "986242807968710727"
         ],
         "ombiHost": "http://ombi.com"
     }
