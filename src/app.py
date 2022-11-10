@@ -527,32 +527,61 @@ async def search(message, *args):
                 if config_host and config_apikey:
 
                     try:
-                        print(f'{host}/api/v2/Search/multi/{search[3:]}')
-
                         r_movie = requests.post(f'{host}/api/v2/Search/multi/{search[3:]}',
                         params = params, 
                         headers={'Content-Type':'application/json'},
                         data = json.dumps({'movies': 'true', 'tvShows': 'true'}))
 
-                        print(params)
-                        print(r_movie.status_code)
-                        print(r_movie.headers)
-                        print(r_movie.json())
-                        # print(r_movie.json())
+                        p_results = r_movie.json()
+                        results = []
+
+
+                        if len(p_results) >= 6:
+                            for content in p_results[:5]:
+                                results.append({'name': content["title"], 'id': content["id"], 'cover': f'https://image.tmdb.org/t/p/w300/{content["poster"][1:]}'})
+                                
+                    
+                        else:
+                            for content in p_results:
+                                results.append({'name': content["title"], 'id': content["id"], 'cover': f'https://image.tmdb.org/t/p/w300/{content["poster"][1:]}'})
+                    
+
+
+
+                        print(results)
+
+
+
+
+
+                        embed = discord.Embed(title = f'Result to: ', description=f'***ID:***', color=0xFFD062, )
+
+                        
+                        # embed.set_image(url = results[0]['cover'])
+
+                        embed.set_author(name = f'Hi, {str(message.author)[:str(message.author).find("#")]}.', url = 'https://github.com/elhaban3ro', icon_url = message.author.avatar)
+
+
+                        embed.set_footer(text = f'...', icon_url='https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Sign-check-icon.png/800px-Sign-check-icon.png')
+
+                        await message.reply(embed = embed)
+
+
                         
 
 
                         if r_movie.status_code == 200:
                             embed = discord.Embed(title = f'SEARCH: {search_clean[1:]}', description=f'Indexing results...', color=0xFFD062)
                             embed.set_author(name = f'Hi, {str(message.author)[:str(message.author).find("#")]}, thanks for shearch with Botmbi.', url = 'https://github.com/elhaban3ro', icon_url = message.author.avatar)
-                            embed.set_footer(text = f'Consult status: {r_movie.status_code}', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+                            embed.set_footer(text = f'Consult status: {r_movie.status_code}', icon_url='https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Sign-check-icon.png/800px-Sign-check-icon.png')
+
 
                             await message.reply(embed = embed)
 
                         else:
                             embed = discord.Embed(title = f'SEARCH: {search_clean[1:]}', description=f'Something happened...', color=0xFFD062)
                             embed.set_author(name = f'Hi, {str(message.author)[:str(message.author).find("#")]}, thanks for shearch with Botmbi.', url = 'https://github.com/elhaban3ro', icon_url = message.author.avatar)
-                            embed.set_footer(text = f'Consult status: {r_movie.status_code}', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+                            embed.set_footer(text = f'Consult status: {r_movie.status_code}', icon_url='https://www.freeiconspng.com/thumbs/warning-icon-png/sign-warning-icon-png-7.png')
 
                             await message.reply(embed = embed)
 
