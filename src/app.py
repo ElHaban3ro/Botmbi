@@ -60,8 +60,8 @@ client = commands.Bot(command_prefix = get_prefix_custom, intents=intents)
 @client.event
 async def on_ready():
     print(f'\n\n= = = = = Started bot! 🌟 | {client.user} = = = = =') # Bot iniciado.
-    # presence = discord.Activity(name = 'Ombi Requests', url = 'https://github.com/elhaban3ro', type='streaming', details = 'Use /help to view my commands', buttons = ['View GitHub'])
-    # await client.change_presence(activity=presence)
+    presence = discord.Streaming(name = 'Ombi Requests', url = 'https://github.com/elhaban3ro', details = 'Use /help to view my commands', platform = 'GitHub')
+    await client.change_presence(activity=presence, status = discord.Status.dnd)
 
 
 
