@@ -451,20 +451,23 @@ async def search(message, *args):
             user_roles.append(role)
 
 
-
+        global host
         host = ''
         config_host = False
 
 
+        global apikey
         apikey = ''
         config_apikey = False
 
         params = {'ApiKey': apikey}
 
         search = ''
+        search_clean = ''
 
         for word in args:
             search = f'{search}%20{word}'
+            search_clean = f'{search_clean} {word}'
 
         user_allow = False
 
@@ -492,6 +495,7 @@ async def search(message, *args):
                         host = json_c[str(message.guild.id)]['ombiHost']
                         config_host = True
 
+
                     else:
                         embed = discord.Embed(description=f'The application is not configured. Try to configurate *host*```{prefix_see}config [ombi] [host] [value]```', color=0xFFD062)
 
@@ -505,6 +509,9 @@ async def search(message, *args):
 
                     if 'ombiApikey' in list(json_c[str(message.guild.id)].keys()):
                         apikey = json_c[str(message.guild.id)]['ombiApikey']
+                        params['ApiKey'] = json_c[str(message.guild.id)]['ombiApikey']
+
+                        
                         config_apikey = True
                         
 
@@ -520,9 +527,35 @@ async def search(message, *args):
                 if config_host and config_apikey:
 
                     try:
-                        print(search)
-                        r_movie = requests.get(f'{host}/api/v2/Search/multi/{search[3:]}', params = params)
-                        print(r_movie.text)
+                        print(f'{host}/api/v2/Search/multi/{search[3:]}')
+
+                        r_movie = requests.post(f'{host}/api/v2/Search/multi/{search[3:]}',
+                        params = params, 
+                        headers={'Content-Type':'application/json'},
+                        data = json.dumps({'movies': 'true', 'tvShows': 'true'}))
+
+                        print(params)
+                        print(r_movie.status_code)
+                        print(r_movie.headers)
+                        print(r_movie.json())
+                        # print(r_movie.json())
+                        
+
+
+                        if r_movie.status_code == 200:
+                            embed = discord.Embed(title = f'SEARCH: {search_clean[1:]}', description=f'Indexing results...', color=0xFFD062)
+                            embed.set_author(name = f'Hi, {str(message.author)[:str(message.author).find("#")]}, thanks for shearch with Botmbi.', url = 'https://github.com/elhaban3ro', icon_url = message.author.avatar)
+                            embed.set_footer(text = f'Consult status: {r_movie.status_code}', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+
+                            await message.reply(embed = embed)
+
+                        else:
+                            embed = discord.Embed(title = f'SEARCH: {search_clean[1:]}', description=f'Something happened...', color=0xFFD062)
+                            embed.set_author(name = f'Hi, {str(message.author)[:str(message.author).find("#")]}, thanks for shearch with Botmbi.', url = 'https://github.com/elhaban3ro', icon_url = message.author.avatar)
+                            embed.set_footer(text = f'Consult status: {r_movie.status_code}', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+
+                            await message.reply(embed = embed)
+
 
 
 
