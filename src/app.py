@@ -631,13 +631,14 @@ async def search(message, *args):
                                         print(add_movie.json())
 
                                 else:
-                                    print(results[img_index]['id'])
-                                    data_dict = {'tvDbId': results[img_index]['id'],
-                                                'requestAll': True, 
-                                                'latestSeason': True,
-                                                'firstSeason': True}
+                                    
+                                    print(f'{results[img_index]["id"]}, {host}/api/v2/Request/tv')
+                                    data_dict = {'theMovieDbId': results[img_index]['id'],
+                                                'requestAll': 'true', 
+                                                'latestSeason': 'false',
+                                                'firstSeason': 'false'}
 
-                                    add_movie = requests.get(f'{host}/api/v1/Request/tv',
+                                    add_movie = requests.post(f'{host}/api/v2/Requests/tv',
                                     params = params, 
                                     headers={'Content-Type':'application/json'},
                                     data = json.dumps(data_dict))
@@ -697,7 +698,7 @@ async def search(message, *args):
 
 
                                 # Request
-                                @discord.ui.button(label='🍔 More ', style=discord.ButtonStyle.green)
+                                @discord.ui.button(label='🍔 See More ', style=discord.ButtonStyle.green)
                                 async def more(self, interaction: discord.Interaction, button: discord.ui.Button):
                                     global img_index
                                     embed_img.set_image(url = '')
