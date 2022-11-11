@@ -575,8 +575,6 @@ async def search(message, *args):
 
                             class RequestButtons(discord.ui.View):
 
-
-
                                 @discord.ui.button(label='⬅', style=discord.ButtonStyle.blurple)
                                 async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
 
@@ -631,12 +629,27 @@ async def search(message, *args):
                                         print(add_movie.json())
 
                                 else:
+                                    show_info = requests.get(f'https://api.themoviedb.org/3/tv/{results[img_index]["id"]}?api_key=5eb7e21201ae0b13d5e4f992ee9d5471&language=en-US')
+                                    show_dict = show_info.json()
+                                    global seasons_count
+                                    seasons_count = len(show_dict['seasons'])
+
+                                
+
+
+                            for season in range(1, seasons_count):
+                                @discord.ui.button(label = f'💌 {season}', style = discord.ButtonStyle.primary)
+                                async def req_movie(self, interaction: discord.Interaction, button: discord.ui.Button):
                                     
-                                    print(f'{results[img_index]["id"]}, {host}/api/v2/Request/tv')
                                     data_dict = {'theMovieDbId': results[img_index]['id'],
-                                                'requestAll': 'true', 
+                                                'requestAll': 'false', 
                                                 'latestSeason': 'false',
-                                                'firstSeason': 'false'}
+                                                'firstSeason': 'false',
+                                                'seasons': [
+                                                    {
+                                                    'seasonNumber': season
+                                                    }
+                                                ]}
 
                                     add_movie = requests.post(f'{host}/api/v2/Requests/tv',
                                     params = params, 
@@ -648,7 +661,7 @@ async def search(message, *args):
                                     print(add_movie_status)
                                     print(add_movie.json())
                             
-
+                                RequestButtons.add_item()
 
 
                             # print(results)
