@@ -470,7 +470,7 @@ async def search(message, *args):
             search_clean = f'{search_clean} {word}'
 
         user_allow = False
-
+        search_continue = False
 
 
         with open('./src/communities.json') as file_c:
@@ -493,6 +493,10 @@ async def search(message, *args):
 
                     if 'ombiHost' in list(json_c[str(message.guild.id)].keys()):
                         host = json_c[str(message.guild.id)]['ombiHost']
+                        if host[-1] == '/':
+                            host = host[:-1]
+
+
                         config_host = True
 
 
@@ -534,87 +538,184 @@ async def search(message, *args):
 
                         p_results = r_movie.json()
                         results = []
-
-
-                        if len(p_results) >= 6:
-                            for content in p_results[:5]:
-                                results.append({'name': content["title"], 'id': content["id"], 'cover': f'https://image.tmdb.org/t/p/w300/{content["poster"][1:]}'})
-                                
-                    
-                        else:
+                        
+                        if len(p_results) != 0:
                             for content in p_results:
-                                results.append({'name': content["title"], 'id': content["id"], 'cover': f'https://image.tmdb.org/t/p/w300/{content["poster"][1:]}'})
-                    
+                                search_continue = True
+                                try:
+                                    results.append({'name': content["title"], 'id': content["id"], 'cover': f'https://image.tmdb.org/t/p/w300/{content["poster"][1:]}', 'contentType': content['mediaType'], 'description': content['overview']})
 
-
-
-
-
-
-                        global img_index
-                        img_index = 0
-
-
-                        embed_img = discord.Embed(title = f'Result to: {results[img_index]["name"]}', description=f'***ID:*** {results[img_index]["id"]}', color=0xFFD062)
+                                except:
+                                    pass
                         
+                        else:
+                            embed_eror_nocontent = discord.Embed(title = f'No retults to {search_clean[1:]}', description=f'No content found for your search. Make sure you are typing your search correctly.', color=0xFFD062)
+                            
+                            embed_eror_nocontent.set_author(name = f'Hi, {str(message.author)[:str(message.author).find("#")]}.', url = 'https://github.com/elhaban3ro', icon_url = message.author.avatar)
 
-                        embed_img.set_image(url = results[img_index]['cover'])
+                            embed_eror_nocontent.set_footer(text = f'View more with {prefix_see}help')
 
-                        embed_img.set_author(name = f'Hi, {str(message.author)[:str(message.author).find("#")]}.', url = 'https://github.com/elhaban3ro', icon_url = message.author.avatar)
-
-                        embed_img.set_footer(text = f'...', icon_url='https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Sign-check-icon.png/800px-Sign-check-icon.png')
-
+                            await message.reply(embed = embed_eror_nocontent)
 
 
                         
-                        print(results)
-                        class ImageButtons(discord.ui.View):
+                        if search_continue:
+                            global img_index
+                            img_index = 0
+
+                            embed_img = discord.Embed(title = f'Result to: {results[img_index]["name"]}', description=f'***ID:*** {results[img_index]["id"]}, ***TYPE:*** {results[img_index]["contentType"]}', color=0xFFD062)
+
+                            embed_img.set_image(url = results[img_index]['cover'])
+
+                            embed_img.set_author(name = f'Hi, {str(message.author)[:str(message.author).find("#")]}.', url = 'https://github.com/elhaban3ro', icon_url = message.author.avatar)
+
+                            embed_img.set_footer(text = f'Request with Botmbi 👉👈 to Ombi', icon_url='https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Sign-check-icon.png/800px-Sign-check-icon.png')
 
 
-                            # Before Image.
-                            @discord.ui.button(label='<', style=discord.ButtonStyle.green)
-                            async def before(self, interaction: discord.Interaction, button: discord.ui.Button):
-                                global img_index
-                                if img_index == 0:
-                                    img_index = len(results) - 1
+
+                            class RequestButtons(discord.ui.View):
+
+
+
+                                @discord.ui.button(label='⬅', style=discord.ButtonStyle.blurple)
+                                async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
+
+                                    global img_index
+
+                                    embed_img.set_image(url = results[img_index]['cover'])
+                                    embed_img.title = f'{results[img_index]["name"]}'
+                                    embed_img.description = f'***ID:*** {results[img_index]["id"]}, ***TYPE:*** {results[img_index]["contentType"]}'
+
+
+                                    button.style = discord.ButtonStyle.green
+
+                                    embed_img.set_thumbnail(url = '')
+
+                                    await interaction.message.edit(embed=embed_img, view=ImageButtons())
+
+
+
+                                if results[img_index]['contentType'] == 'movie':
+
+                                    @discord.ui.button(label = '💌 ORDER', style = discord.ButtonStyle.primary)
+                                    async def req_movie(self, interaction: discord.Interaction, button: discord.ui.Button):
+                                        add_movie = requests.post(f'{host}/api/v1/Request/movie',
+                                        params = params, 
+                                        headers={'Content-Type':'application/json'},
+                                        data = json.dumps({'theMovieDbId': results[img_index]['id']}))
+                                        add_movie_status = add_movie.status_code
+
+
+
+
+                                        if add_movie_status == 200:
+                                            embed_img.title = f'REQUEST OF {results[img_index]["name"]}'
+                                            embed_img.description = f'Your content request was successful! 💦'
+
+                                            embed_img.set_footer(text = f'Consult status: {add_movie_status}', icon_url='https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXU5A1PIYQh5hlcX0nvUOGsx8DdQBJjIAVHubSaIAlp1fb3cyhW-NmkkoyS2aCtZ-qFwW4JvMQlj7CVp9qn2Aaw_0ZtZ2z6JYbGIFQ-YV_X81btlOvxxcjrQyWGkSc/330x192')
+
+
+
+
+                                        else:
+                                            embed_img.title = f'REQUEST OF {results[img_index]["name"]} ERROR !!!!'
+                                            embed_img.description = f'There was an error with the request. Check your url and apikey.'
+
+                                            embed_img.set_footer(text = f'Consult status: {add_movie_status}', icon_url='https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXU5A1PIYQh5hlcX0nvUOGsx8DdQBJjIAVHubSaIAlp1fb3cyhW-NmkkoyS2aCtZ-qFwW4JvMQlj7CVp9qn2Aaw_0ZtZ2z6JYbGIFQ-YV_X81btlOvxxcjrQyWGkSc/330x192')
+
+
+                                        await interaction.message.edit(embed = embed_img, view=None)
+        
+
+
+                                        print(add_movie.json())
 
                                 else:
-                                    img_index = img_index - 1
+                                    print(results[img_index]['id'])
+                                    data_dict = {'tvDbId': results[img_index]['id'],
+                                                'requestAll': True, 
+                                                'latestSeason': True,
+                                                'firstSeason': True}
 
+                                    add_movie = requests.get(f'{host}/api/v1/Request/tv',
+                                    params = params, 
+                                    headers={'Content-Type':'application/json'},
+                                    data = json.dumps(data_dict))
+                                    
+                                    add_movie_status = add_movie.status_code
 
-                                embed_img.set_image(url = results[img_index]['cover'])
-                                embed_img.description = f'***ID: *** {results[img_index]["id"]}'
-
-                                button.style = discord.ButtonStyle.green
-                                await interaction.message.edit(embed=embed_img, view=self)
-
-
-
-                            # Next Image.
-                            @discord.ui.button(label='>', style=discord.ButtonStyle.green)
-                            async def next(self, interaction: discord.Interaction, button: discord.ui.Button):
-                                global img_index
-                                if img_index == len(results) - 1:
-                                    img_index = 0
-
-                                else:
-                                    img_index = img_index + 1
+                                    print(add_movie_status)
+                                    print(add_movie.json())
+                            
 
 
 
-                                embed_img.set_image(url = results[img_index]['cover'])
-                                embed_img.description = f'***ID: *** {results[img_index]["id"]}'
+                            # print(results)
+                            class ImageButtons(discord.ui.View):
 
 
-                                button.style = discord.ButtonStyle.green
-                                await interaction.message.edit(embed=embed_img, view=self)
+                                # Before Image.
+                                @discord.ui.button(label='<', style=discord.ButtonStyle.green)
+                                async def before(self, interaction: discord.Interaction, button: discord.ui.Button):
+                                    global img_index
+                                    if img_index == 0:
+                                        img_index = len(results) - 1
+
+                                    else:
+                                        img_index = img_index - 1
+
+
+                                    embed_img.set_image(url = results[img_index]['cover'])
+                                    embed_img.title = f'{results[img_index]["name"]}'
+                                    embed_img.description = f'***ID:*** {results[img_index]["id"]}, ***TYPE:*** {results[img_index]["contentType"]}'
+
+
+                                    button.style = discord.ButtonStyle.green
+                                    await interaction.message.edit(embed=embed_img, view=self)
+
+
+
+                                # Next Image.
+                                @discord.ui.button(label='>', style=discord.ButtonStyle.green)
+                                async def next(self, interaction: discord.Interaction, button: discord.ui.Button):
+                                    global img_index
+                                    if img_index == len(results) - 1:
+                                        img_index = 0
+
+                                    else:
+                                        img_index = img_index + 1
+
+
+
+                                    embed_img.set_image(url = results[img_index]['cover'])
+                                    embed_img.title = f'{results[img_index]["name"]}'
+                                    embed_img.description = f'***ID:*** {results[img_index]["id"]}, ***TYPE:*** {results[img_index]["contentType"]}'
+                                    
+
+                                    button.style = discord.ButtonStyle.green
+                                    await interaction.message.edit(embed=embed_img, view=self)
+
+
+                                # Request
+                                @discord.ui.button(label='🍔 More ', style=discord.ButtonStyle.green)
+                                async def more(self, interaction: discord.Interaction, button: discord.ui.Button):
+                                    global img_index
+                                    embed_img.set_image(url = '')
+                                    embed_img.set_thumbnail(url = results[img_index]['cover'])
+
+                                    embed_img.title = f'{results[img_index]["name"]}'
+                                    embed_img.description = f'{results[img_index]["description"]}'
+
+
+                                    await interaction.message.edit(embed=embed_img, view=RequestButtons())
 
 
 
 
 
 
-                        await message.reply(embed = embed_img, view = ImageButtons())
+
+                            await message.reply(embed = embed_img, view = ImageButtons())
 
 
                         
