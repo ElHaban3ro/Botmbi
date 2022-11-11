@@ -875,7 +875,16 @@ client.remove_command('help')
 @client.command()
 async def help(message, *args):
     
-    help_text = f'**Configure your Ombi app:** ```{prefix_see}config [ombi] [host, apikey] [value]```\n\n**Configure your prefix:**```{prefix_see}prefix [new prefix]```\n\n**Add permissions to a role so that they can make requests::**```{prefix_see}add [@roles]```\n\n**Remove permissions to a role so that they can make requests::**```{prefix_see}remove [@roles]```'
+    help_text = f"""
+    **Configure your Ombi app:** ```{prefix_see}config [ombi] [host, apikey] [value]```\n\n
+
+    **Configure your prefix:**```{prefix_see}prefix [new prefix]```\n\n
+    
+    **Add permissions to a role so that they can make requests:**```{prefix_see}add [@roles]```\n\n
+    
+    **Remove permissions to a role so that they can't make requests:**```{prefix_see}remove [@roles]```\n\n
+    
+    **Make a content request to your ombi:**```{prefix_see}search [your content to search]```\n\n"""
 
     embed = discord.Embed(title = 'Commands Help | BOTMBI', description=help_text, url='https://github.com/elhaban3ro', color=0xFFD062)
     embed.set_author(name = f'Hi, {str(message.author)[:str(message.author).find("#")]}', url = 'https://github.com/elhaban3ro', icon_url = message.author.avatar)
