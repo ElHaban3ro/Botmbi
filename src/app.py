@@ -537,6 +537,7 @@ async def search(message, *args):
                         data = json.dumps({'movies': 'true', 'tvShows': 'true'}))
 
                         p_results = r_movie.json()
+                        global results
                         results = []
                         
                         if len(p_results) != 0:
@@ -573,7 +574,132 @@ async def search(message, *args):
 
 
 
-                            class RequestButtons(discord.ui.View):
+                            class movieButtons(discord.ui.View):
+                                @discord.ui.button(label='⬅', style=discord.ButtonStyle.blurple)
+                                async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
+                                    
+
+                                    embed_img.set_image(url = results[img_index]['cover'])
+                                    embed_img.title = f'{results[img_index]["name"]}'
+                                    embed_img.description = f'***ID:*** {results[img_index]["id"]}, ***TYPE:*** {results[img_index]["contentType"]}'
+
+
+                                    button.style = discord.ButtonStyle.green
+
+                                    embed_img.set_thumbnail(url = '')
+
+                                    await interaction.message.edit(embed=embed_img, view=ImageButtons())
+
+
+
+
+                                @discord.ui.button(label = '💌 ORDER', style = discord.ButtonStyle.primary)
+                                async def req_movie(self, interaction: discord.Interaction, button: discord.ui.Button):
+                                    add_movie = requests.post(f'{host}/api/v1/Request/movie',
+                                    params = params, 
+                                    headers={'Content-Type':'application/json'},
+                                    data = json.dumps({'theMovieDbId': results[img_index]['id']}))
+                                    add_movie_status = add_movie.status_code
+
+
+
+
+                                    if add_movie_status == 200:
+                                        embed_img.title = f'{results[img_index]["name"]} request.'
+                                        embed_img.description = f'Your content request was successful! 💦'
+
+                                        embed_img.set_footer(text = f'Consult status: {add_movie_status}', icon_url='https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXU5A1PIYQh5hlcX0nvUOGsx8DdQBJjIAVHubSaIAlp1fb3cyhW-NmkkoyS2aCtZ-qFwW4JvMQlj7CVp9qn2Aaw_0ZtZ2z6JYbGIFQ-YV_X81btlOvxxcjrQyWGkSc/330x192')
+
+
+
+
+                                    else:
+                                        embed_img.title = f'{results[img_index]["name"]} REQUEST ERROR !!!!'
+                                        embed_img.description = f'There was an error with the request. Check your url and apikey.'
+
+                                        embed_img.set_footer(text = f'Consult status: {add_movie_status}', icon_url='https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXU5A1PIYQh5hlcX0nvUOGsx8DdQBJjIAVHubSaIAlp1fb3cyhW-NmkkoyS2aCtZ-qFwW4JvMQlj7CVp9qn2Aaw_0ZtZ2z6JYbGIFQ-YV_X81btlOvxxcjrQyWGkSc/330x192')
+
+
+                                    await interaction.message.edit(embed = embed_img, view=None)
+    
+
+
+
+
+                            class tvButtons(discord.ui.View):
+                                
+                                show_info = requests.get(f'https://api.themoviedb.org/3/tv/{results[img_index]["id"]}?api_key=5eb7e21201ae0b13d5e4f992ee9d5471&language=en-US')
+                                show_dict = show_info.json()
+                                global seasons_count
+                                seasons_count = len(show_dict['seasons'])
+
+                                options = []
+
+                                for season in range(1, seasons_count + 1):
+                                    if season <= 9:
+                                        options.append(discord.SelectOption(label = f'Season 0{season}', description=f'Send request for the season 0{season}'))
+                                    
+                                    else:
+                                        options.append(discord.SelectOption(label=f'Season {season}', description=f'Send request for the season {season}'))
+
+
+
+                                # ===================================
+                                @discord.ui.select(placeholder = 'Select a season:', min_values = 1, max_values = 1, options = options)
+                                async def select_callback(self, interaction, select):
+                                
+                                    global select_option
+                                    select_option = select.values[0]
+                                    select_option = select_option[select_option.find(' ') + 1:]
+
+                                    print(select_option)
+
+                                    # if select_option
+
+                                    data_dict = {'theMovieDbId': results[img_index]['id'],
+                                                'requestAll': 'false', 
+                                                'latestSeason': 'false',
+                                                'firstSeason': 'false',
+                                                'seasons': [
+                                                    {
+                                                    'seasonNumber': select_option
+                                                    }
+                                                ]}
+
+                                    add_movie = requests.post(f'{host}/api/v2/Requests/tv',
+                                    params = params, 
+                                    headers={'Content-Type':'application/json'},
+                                    data = json.dumps(data_dict))
+                                    
+                                    add_tv_status = add_movie.status_code
+
+                                    if add_tv_status == 200:
+                                        embed_img.title = f'{results[img_index]["name"]} season {select_option} request.'
+                                        embed_img.description = f'Your content request was successful! 🍟'
+
+                                        embed_img.set_footer(text = f'Consult status: {add_tv_status}', icon_url='https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXU5A1PIYQh5hlcX0nvUOGsx8DdQBJjIAVHubSaIAlp1fb3cyhW-NmkkoyS2aCtZ-qFwW4JvMQlj7CVp9qn2Aaw_0ZtZ2z6JYbGIFQ-YV_X81btlOvxxcjrQyWGkSc/330x192')
+
+
+
+
+                                    else:
+                                        embed_img.title = f'{results[img_index]["name"]} REQUEST ERROR !!!!'
+                                        embed_img.description = f'There was an error with the request. Check your url and apikey.'
+
+                                        embed_img.set_footer(text = f'Consult status: {add_tv_status}', icon_url='https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXU5A1PIYQh5hlcX0nvUOGsx8DdQBJjIAVHubSaIAlp1fb3cyhW-NmkkoyS2aCtZ-qFwW4JvMQlj7CVp9qn2Aaw_0ZtZ2z6JYbGIFQ-YV_X81btlOvxxcjrQyWGkSc/330x192')
+
+
+
+                                    await interaction.message.edit(embed = embed_img, view=None)
+
+
+
+
+
+
+
+                                        
+
 
                                 @discord.ui.button(label='⬅', style=discord.ButtonStyle.blurple)
                                 async def back(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -593,75 +719,11 @@ async def search(message, *args):
 
 
 
-                                if results[img_index]['contentType'] == 'movie':
-
-                                    @discord.ui.button(label = '💌 ORDER', style = discord.ButtonStyle.primary)
-                                    async def req_movie(self, interaction: discord.Interaction, button: discord.ui.Button):
-                                        add_movie = requests.post(f'{host}/api/v1/Request/movie',
-                                        params = params, 
-                                        headers={'Content-Type':'application/json'},
-                                        data = json.dumps({'theMovieDbId': results[img_index]['id']}))
-                                        add_movie_status = add_movie.status_code
 
 
 
 
-                                        if add_movie_status == 200:
-                                            embed_img.title = f'REQUEST OF {results[img_index]["name"]}'
-                                            embed_img.description = f'Your content request was successful! 💦'
 
-                                            embed_img.set_footer(text = f'Consult status: {add_movie_status}', icon_url='https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXU5A1PIYQh5hlcX0nvUOGsx8DdQBJjIAVHubSaIAlp1fb3cyhW-NmkkoyS2aCtZ-qFwW4JvMQlj7CVp9qn2Aaw_0ZtZ2z6JYbGIFQ-YV_X81btlOvxxcjrQyWGkSc/330x192')
-
-
-
-
-                                        else:
-                                            embed_img.title = f'REQUEST OF {results[img_index]["name"]} ERROR !!!!'
-                                            embed_img.description = f'There was an error with the request. Check your url and apikey.'
-
-                                            embed_img.set_footer(text = f'Consult status: {add_movie_status}', icon_url='https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXU5A1PIYQh5hlcX0nvUOGsx8DdQBJjIAVHubSaIAlp1fb3cyhW-NmkkoyS2aCtZ-qFwW4JvMQlj7CVp9qn2Aaw_0ZtZ2z6JYbGIFQ-YV_X81btlOvxxcjrQyWGkSc/330x192')
-
-
-                                        await interaction.message.edit(embed = embed_img, view=None)
-        
-
-
-                                        print(add_movie.json())
-
-                                else:
-                                    show_info = requests.get(f'https://api.themoviedb.org/3/tv/{results[img_index]["id"]}?api_key=5eb7e21201ae0b13d5e4f992ee9d5471&language=en-US')
-                                    show_dict = show_info.json()
-                                    global seasons_count
-                                    seasons_count = len(show_dict['seasons'])
-
-                                
-
-
-                            for season in range(1, seasons_count):
-                                @discord.ui.button(label = f'💌 {season}', style = discord.ButtonStyle.primary)
-                                async def req_movie(self, interaction: discord.Interaction, button: discord.ui.Button):
-                                    
-                                    data_dict = {'theMovieDbId': results[img_index]['id'],
-                                                'requestAll': 'false', 
-                                                'latestSeason': 'false',
-                                                'firstSeason': 'false',
-                                                'seasons': [
-                                                    {
-                                                    'seasonNumber': season
-                                                    }
-                                                ]}
-
-                                    add_movie = requests.post(f'{host}/api/v2/Requests/tv',
-                                    params = params, 
-                                    headers={'Content-Type':'application/json'},
-                                    data = json.dumps(data_dict))
-                                    
-                                    add_movie_status = add_movie.status_code
-
-                                    print(add_movie_status)
-                                    print(add_movie.json())
-                            
-                                RequestButtons.add_item()
 
 
                             # print(results)
@@ -713,15 +775,26 @@ async def search(message, *args):
                                 # Request
                                 @discord.ui.button(label='🍔 See More ', style=discord.ButtonStyle.green)
                                 async def more(self, interaction: discord.Interaction, button: discord.ui.Button):
-                                    global img_index
+                                    
+
+                                    
+                                    
                                     embed_img.set_image(url = '')
                                     embed_img.set_thumbnail(url = results[img_index]['cover'])
 
                                     embed_img.title = f'{results[img_index]["name"]}'
                                     embed_img.description = f'{results[img_index]["description"]}'
+                                    # print(results[img_index]['contentType'])
+
+                                    if results[img_index]['contentType'] == 'movie':
+                                        view = movieButtons()
+                                    
+                                    else:
+                                        view = tvButtons()
 
 
-                                    await interaction.message.edit(embed=embed_img, view=RequestButtons())
+
+                                    await interaction.message.edit(embed=embed_img, view=view)
 
 
 
@@ -735,15 +808,7 @@ async def search(message, *args):
                         
 
 
-                        if r_movie.status_code == 200:
-                            pass
-                            # embed = discord.Embed(description=f'Indexing results...', color=0xFFD062)
-                            # embed.set_footer(text = f'Consult status: {r_movie.status_code}', icon_url='https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Sign-check-icon.png/800px-Sign-check-icon.png')
-                            # await message.reply(embed = embed)
-
-
-
-                        else:
+                        if r_movie.status_code != 200:
                             embed = discord.Embed(title = f'SEARCH: {search_clean[1:]}', description=f'Something happened...', color=0xFFD062)
                             embed.set_author(name = f'Hi, {str(message.author)[:str(message.author).find("#")]}, thanks for shearch with Botmbi.', url = 'https://github.com/elhaban3ro', icon_url = message.author.avatar)
                             embed.set_footer(text = f'Consult status: {r_movie.status_code}', icon_url='https://www.freeiconspng.com/thumbs/warning-icon-png/sign-warning-icon-png-7.png')
