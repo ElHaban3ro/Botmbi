@@ -60,7 +60,7 @@ client = commands.Bot(command_prefix = get_prefix_custom, intents=intents)
 @client.event
 async def on_ready():
     print(f'\n\n= = = = = Started bot! 🌟 | {client.user} = = = = =') # Bot iniciado.
-    presence = discord.Streaming(name = 'Ombi Requests', url = 'https://github.com/elhaban3ro', details = 'Use /help to view my commands', platform = 'GitHub')
+    presence = discord.Streaming(name = 'Ombi Requests', url = 'https://github.com/elhaban3ro', details = 'Use /help', platform = 'GitHub')
     await client.change_presence(activity=presence, status = discord.Status.dnd)
 
 
@@ -876,15 +876,15 @@ client.remove_command('help')
 async def help(message, *args):
     
     help_text = f"""
-    **Configure your Ombi app:** ```{prefix_see}config [ombi] [host, apikey] [value]```\n\n
+    **Configure your Ombi app:** ```{prefix_see}config [ombi] [host, apikey] [value]```\n
 
-    **Configure your prefix:**```{prefix_see}prefix [new prefix]```\n\n
+    **Configure your prefix:**```{prefix_see}prefix [new prefix]```\n
     
-    **Add permissions to a role so that they can make requests:**```{prefix_see}add [@roles]```\n\n
+    **Add permissions to a role so that they can make requests:**```{prefix_see}add [@roles]```\n
     
-    **Remove permissions to a role so that they can't make requests:**```{prefix_see}remove [@roles]```\n\n
+    **Remove permissions to a role so that they can't make requests:**```{prefix_see}remove [@roles]```\n
     
-    **Make a content request to your ombi:**```{prefix_see}search [your content to search]```\n\n"""
+    **Make a content request to your ombi:**```{prefix_see}search [your content to search]```\n"""
 
     embed = discord.Embed(title = 'Commands Help | BOTMBI', description=help_text, url='https://github.com/elhaban3ro', color=0xFFD062)
     embed.set_author(name = f'Hi, {str(message.author)[:str(message.author).find("#")]}', url = 'https://github.com/elhaban3ro', icon_url = message.author.avatar)
