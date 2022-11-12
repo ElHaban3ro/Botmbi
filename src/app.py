@@ -530,7 +530,7 @@ async def search(message, *args):
 
                 if config_host and config_apikey:
 
-                    if True:
+                    try:
                         r_movie = requests.post(f'{host}/api/v2/Search/multi/{search[3:]}',
                         params = params, 
                         headers={'Content-Type':'application/json'},
@@ -818,12 +818,12 @@ async def search(message, *args):
 
 
 
-                    # except:
-                    #     embed = discord.Embed(description=f'Error in the connection to your server, please check your connection. This may be due to an error in the API Key or in the Host itself.:```{prefix_see}config [ombi] [host, apikey] [value]```', color=0xFFD062)
+                    except:
+                        embed = discord.Embed(description=f'Error in the connection to your server, please check your connection. This may be due to an error in the API Key or in the Host itself.:```{prefix_see}config [ombi] [host, apikey] [value]```', color=0xFFD062)
 
 
-                    #     embed.set_footer(text = f'view more with {prefix_see}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
-                    #     await message.reply(embed = embed)
+                        embed.set_footer(text = f'view more with {prefix_see}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+                        await message.reply(embed = embed)
 
 
 
