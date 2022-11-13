@@ -6,6 +6,7 @@ PD: I recommend having a specific role to be able to request content (configurat
 ## BOT INVITE 📤
 ---
 [![Discord Bot Invite](https://img.shields.io/badge/INVITE_BOTMBI_HANDSOME_TO_YOUR_SERVER-INVITE-lightgray?style=for-the-badge&logo=discord)](https://discord.com/api/oauth2/authorize?client_id=1039653278172057630&permissions=8&scope=bot)
+[![Discord Bot Invite](https://img.shields.io/badge/WEB-green?style=for-the-badge)](https://elhaban3ro.github.io/Botmbi/)
 
 
 

@@ -1,13 +1,22 @@
 # Libraries basics.
+import json
 import os
+import codecs
 
 
 # Third Libraries
 import discord
-
-from discord.ext import commands
-import json
 import requests
+from discord.ext import commands
+
+import encryption
+
+# Security Settings
+key = 'testtesttesttest'
+
+
+
+
 
 
 
@@ -128,8 +137,6 @@ async def prefix(ctx, *args):
 
 
 
-
-
 @client.command()
 async def config(ctx, *args):
     
@@ -138,9 +145,17 @@ async def config(ctx, *args):
         args = list(args)
 
         if len(args) == 3:
+            
             config_app = args[0]
             config_name = args[1]
             config_value = args[2]
+
+            config_value_en = encryption.encrypt(bytes(key, encoding='UTF-8'), bytes(config_value, encoding='UTF-8'))
+            
+            config_value_en = config_value_en
+
+
+
 
             if config_app == 'ombi': # Si se quiere configurar ombi!
                 if config_name == 'host':
@@ -151,13 +166,14 @@ async def config(ctx, *args):
 
                             if str(ctx.guild.id) in list(read_f_u.keys()): # Si está ya en la lista, solo puede significar 2 cosas: o ya se configuró antes, o se estableció antes el prefixs
 
-                                read_f_u[str(ctx.guild.id)]['ombiHost'] = config_value
+
+                                read_f_u[str(ctx.guild.id)]['ombiHost'] = config_value_en.decode('latin')
 
 
                             else:
                                 read_f_u[str(ctx.guild.id)] = {
                                     'communityName': ctx.guild.name,
-                                    'ombiHost': config_value,
+                                    'ombiHost': config_value_en.decode('latin'),
                                     'prefix': read_f_u['General']['prefix']
                                 }
 
@@ -195,7 +211,7 @@ async def config(ctx, *args):
                                 read_f[str(ctx.guild.id)]['prefix'] = read_f['General']['prefix']
 
 
-                            read_f[str(ctx.guild.id)]['ombiApikey'] = config_value
+                            read_f[str(ctx.guild.id)]['ombiApikey'] = config_value_en.decode('latin')
 
                         else:
                             read_f[str(ctx.guild.id)] = {'communityName': ctx.guild.name, 'prefix': read_f['General']['prefix']}
@@ -212,18 +228,6 @@ async def config(ctx, *args):
                     embed.set_footer(text = f'view more with {prefix_see}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
 
                     await ctx.reply(embed = embed)
-
-
-
-
-
-
-                    
-
-
-                elif config_name == 'apikey': # Si se quiere configurar 
-                    pass
-
 
                 else:
                     embed = discord.Embed(title = 'BOTMBI', description=f'Option not available\nFollow the format below:\n\t```{prefix_see}config [ombi] [host, apikey] [value]```', url='https://github.com/elhaban3ro', color=0xFFD062)
@@ -477,6 +481,7 @@ async def search(message, *args):
             json_c = json.load(file_c)
 
 
+
             if str(message.guild.id) in list(json_c.keys()):
                 if 'allowed_roles_ombi' in list(json_c[str(message.guild.id)].keys()):
                     
@@ -491,8 +496,19 @@ async def search(message, *args):
             if message.author.guild_permissions.administrator or user_allow:
                 if str(message.guild.id) in list(json_c.keys()):
 
+                    
+
+
+
                     if 'ombiHost' in list(json_c[str(message.guild.id)].keys()):
                         host = json_c[str(message.guild.id)]['ombiHost']
+
+                        host_encrypted = bytes(host, encoding = 'latin')
+                        
+                        host = str(encryption.decrypt(bytes(key, encoding = 'UTF-8'), host_encrypted))
+                        print(host)
+
+
                         if host[-1] == '/':
                             host = host[:-1]
 
@@ -513,7 +529,10 @@ async def search(message, *args):
 
                     if 'ombiApikey' in list(json_c[str(message.guild.id)].keys()):
                         apikey = json_c[str(message.guild.id)]['ombiApikey']
-                        params['ApiKey'] = json_c[str(message.guild.id)]['ombiApikey']
+                        apikey_encrypted = bytes(apikey, encoding = 'latin')
+                        apikey = str(encryption.decrypt(bytes(key, encoding = 'UTF-8'), apikey_encrypted))
+
+                        params['ApiKey'] = apikey
 
                         
                         config_apikey = True
