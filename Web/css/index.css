@@ -27,7 +27,7 @@ body {
     justify-content: center;
     flex-direction: row;
     align-items: center;
-    background: #414141e7;
+    background: #414141f3;
 
 
     max-width: 53rem;
@@ -108,3 +108,67 @@ body {
 }
 
 
+
+
+
+
+@media screen and (max-width: 920px){
+    .info_div a {
+        padding: 10px 20px;
+    }
+}
+
+
+
+
+@media screen and (max-width: 800px){
+    .main {
+        flex-direction: column;
+    }
+
+
+    .title {
+        text-align: center;
+        margin: 0;
+    }
+
+    
+    .info_div {
+        padding-left: 0rem;
+        text-align: center;
+    }
+
+
+}
+
+
+@media screen and (max-width: 470px) {
+    .buttons_div {
+
+        display: flex;
+        flex-direction: column;
+
+    }
+
+    .button {
+        margin: 10px 0;
+    }
+
+}
+
+
+
+
+@media screen and (max-width: 380px) {
+    .image_div img {
+        width: 120px;
+    }
+
+    .title {
+        font-size: 50px;
+    }
+
+    body {
+        padding: 1.5rem;
+    }
+}
