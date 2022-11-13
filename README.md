@@ -35,6 +35,30 @@ PD: I recommend having a specific role to be able to request content (configurat
 ---
  [![JOIN SERVER](https://img.shields.io/badge/Discord-JOIN_TO_MY_SERVER-lightgray?style=for-the-badge&logo=discord)](https://discord.gg/NGp9YbYJ8F)
 
+
+
+
+## TO DEVS
+---
+
+You install the dependencies used using pip!
+```bash
+pip install -r requirements.txt
+```
+
+inside the **root** folder, create a private folder and inside it create the ``config_bot.txt`` file, where you will put in the first line the discord API KEY. In the second line, you will put a base string to **encrypt** the data. UwU
+
+
+To **run the program** you have to do it from the **main directory** and run
+ ```bash
+ py src/app.py
+ ```
+
+
+
+
+
+
 ## Autor Contact
 ---
 
