@@ -12,7 +12,12 @@ from discord.ext import commands
 import encryption
 
 # Security Settings
-key = 'testtesttesttest'
+
+with open('./private/config_bot.txt', 'r+') as keybase:
+    key = keybase.readlines()[1]
+
+    print(key)
+
 
 
 
@@ -837,12 +842,12 @@ async def search(message, *args):
 
 
 
-                    # except:
-                    #     embed = discord.Embed(description=f'Error in the connection to your server, please check your connection. This may be due to an error in the API Key or in the Host itself.:```{prefix_see}config [ombi] [host, apikey] [value]```', color=0xFFD062)
+                    except:
+                        embed = discord.Embed(description=f'Error in the connection to your server, please check your connection. This may be due to an error in the API Key or in the Host itself.:```{prefix_see}config [ombi] [host, apikey] [value]```', color=0xFFD062)
 
 
-                    #     embed.set_footer(text = f'view more with {prefix_see}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
-                    #     await message.reply(embed = embed)
+                        embed.set_footer(text = f'view more with {prefix_see}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+                        await message.reply(embed = embed)
 
 
 
