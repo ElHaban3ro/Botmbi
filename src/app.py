@@ -505,8 +505,8 @@ async def search(message, *args):
 
                         host_encrypted = bytes(host, encoding = 'latin')
                         
-                        host = str(encryption.decrypt(bytes(key, encoding = 'UTF-8'), host_encrypted))
-                        print(host)
+                        host = str(encryption.decrypt(bytes(key, encoding = 'UTF-8'), host_encrypted))[2:-1]
+                        
 
 
                         if host[-1] == '/':
@@ -530,7 +530,7 @@ async def search(message, *args):
                     if 'ombiApikey' in list(json_c[str(message.guild.id)].keys()):
                         apikey = json_c[str(message.guild.id)]['ombiApikey']
                         apikey_encrypted = bytes(apikey, encoding = 'latin')
-                        apikey = str(encryption.decrypt(bytes(key, encoding = 'UTF-8'), apikey_encrypted))
+                        apikey = str(encryption.decrypt(bytes(key, encoding = 'UTF-8'), apikey_encrypted))[2:-1]
 
                         params['ApiKey'] = apikey
 
@@ -837,12 +837,12 @@ async def search(message, *args):
 
 
 
-                    except:
-                        embed = discord.Embed(description=f'Error in the connection to your server, please check your connection. This may be due to an error in the API Key or in the Host itself.:```{prefix_see}config [ombi] [host, apikey] [value]```', color=0xFFD062)
+                    # except:
+                    #     embed = discord.Embed(description=f'Error in the connection to your server, please check your connection. This may be due to an error in the API Key or in the Host itself.:```{prefix_see}config [ombi] [host, apikey] [value]```', color=0xFFD062)
 
 
-                        embed.set_footer(text = f'view more with {prefix_see}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
-                        await message.reply(embed = embed)
+                    #     embed.set_footer(text = f'view more with {prefix_see}help', icon_url='https://www.pngmart.com/files/12/Twitter-Verified-Badge-PNG-HD.png')
+                    #     await message.reply(embed = embed)
 
 
 
